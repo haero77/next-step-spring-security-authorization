@@ -41,6 +41,7 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
         } catch (Exception e) {
+            // fixme: 컨트롤러에서 NPE 발생했는데 여기서 401 처리하고 있음.
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
