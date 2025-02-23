@@ -2,6 +2,7 @@ package nextstep.security.authorization;
 
 import nextstep.security.authentication.Authentication;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.aop.support.AopUtils;
 
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -11,9 +12,11 @@ public class SecuredAuthorizationManager implements AuthorizationManager<MethodI
     @Override
     public AuthorizationDecision check(Authentication authentication, MethodInvocation invocation) {
         Method method = invocation.getMethod();
+        Class<?> targetClass = invocation.getThis().getClass();
+        Method specificMethod = AopUtils.getMostSpecificMethod(method, targetClass);
 
-        if (method.isAnnotationPresent(Secured.class)) {
-            Secured secured = method.getAnnotation(Secured.class);
+        if (specificMethod.isAnnotationPresent(Secured.class)) {
+            Secured secured = specificMethod.getAnnotation(Secured.class);
 
             Set<String> authorities = authentication.getAuthorities();
             if (authorities.contains(secured.value())) {
