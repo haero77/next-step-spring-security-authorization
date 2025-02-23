@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class MemberController {
@@ -32,12 +31,10 @@ public class MemberController {
         SecurityContext context = SecurityContextHolder.getContext();
         String email = (String) context.getAuthentication().getPrincipal();
 
-        Optional<Member> memberOpt = memberRepository.findByEmail(email);
-        if (memberOpt.isEmpty()) {
-            throw new IllegalStateException("회원을 찾을 수 없습니다. (email=%s)".formatted(email));
-        }
+        Member existingMember = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalStateException("회원을 찾을 수 없습니다. (email=%s)".formatted(email)));
 
-        return ResponseEntity.ok(memberOpt.get());
+        return ResponseEntity.ok(existingMember);
     }
 
     @Secured("ADMIN")
